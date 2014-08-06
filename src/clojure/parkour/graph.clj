@@ -8,6 +8,7 @@
              ,        (wrapper :as w) (mapreduce :as mr) (reducers :as pr)]
             [parkour.io (dseq :as dseq) (dsink :as dsink)
              ,          (mux :as mux) (dux :as dux)]
+            [parkour.io.dexpr :refer [dexpr]]
             [parkour.util.shutdown :as shutdown]
             [parkour.util :refer
              [ignore-errors returning doto-let prev-reset!]])
@@ -15,7 +16,8 @@
            [clojure.lang Var]
            [org.apache.hadoop.io NullWritable]
            [org.apache.hadoop.mapreduce Job]
-           [org.apache.hadoop.mapreduce.lib.partition HashPartitioner]))
+           [org.apache.hadoop.mapreduce.lib.partition HashPartitioner]
+           [parkour.io.dexpr DExpr]))
 
 (defn ^:private graph-future
   "Future result of applying function `f` to the values held by futures
@@ -133,10 +135,15 @@ node or a vector of job nodes."
   [alloc set-class uvar & args]
   (fn [job] (set-class job (apply alloc job uvar args))))
 
+(defmethod remote-config DExpr
+  [alloc set-class uvar & args]
+  (fn [job] (set-class job (apply alloc job uvar args))))
+
 (defmethod remote-config :default
   [_ _ task & args]
   (let [msg (str "Invalid task implementation `" task `";"
-                 " tasks may only be implemented by classes or vars.")]
+                 " tasks may only be implemented by"
+                 " classes, vars, or dexprs.")]
    (throw (ex-info msg {:task task}))))
 
 (defmacro ^:private defremotes

@@ -30,7 +30,7 @@
         w (if (::mr/raw m)
             identity
             (::mr/adapter m default))]
-    (w (with-meta @v m))))
+    (w v)))
 
 (defn with-task-ex*
   "Functional form of `with-task-ex` macro."

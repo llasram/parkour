@@ -1,5 +1,5 @@
 (ns parkour.cser
-  (:refer-clojure :exclude [assoc! get])
+  (:refer-clojure :exclude [assoc! get read-string])
   (:require [parkour.conf :as conf])
   (:import [org.apache.hadoop.conf Configuration]
            [parkour.edn EdnReader]))
@@ -30,9 +30,9 @@ de/serialization."
      (binding [*conf* conf]
        (apply assoc!* conf key val kvs))))
 
-(defn ^:private edn-read-string
+(defn read-string
   "Like core `edn/read-string`, but using cser/EDN reader implementation."
-  ([s] (edn-read-string {:eof nil, :readers *data-readers*} s))
+  ([s] (read-string {:eof nil, :readers *data-readers*} s))
   ([opts s] (when s (EdnReader/readString s opts))))
 
 (defn get
@@ -43,4 +43,4 @@ de/serialization."
        (let [val (conf/get conf key nil)]
          (if (nil? val)
            default
-           (edn-read-string val))))))
+           (read-string val))))))

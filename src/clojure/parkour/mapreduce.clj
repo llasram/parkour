@@ -189,7 +189,6 @@ invoked with the task context to execute the task.
 
 See also: `collfn`, `contextfn`."
   [conf var & args]
-  (assert (instance? Var var))
   (let [i (conf/get-int conf "parkour.mapper.next" 0)]
     (conf/assoc! conf "parkour.mapper.next" (inc i))
     (cser/assoc! conf
@@ -199,7 +198,6 @@ See also: `collfn`, `contextfn`."
 
 (defn ^:private reducer!*
   [step conf var & args]
-  (assert (instance? Var var))
   (let [i (conf/get-int conf "parkour.reducer.next" 0)]
     (conf/assoc! conf
       "parkour.reducer.next" (inc i)
@@ -244,7 +242,6 @@ as `OOLL`.
 
 See also: `partfn`."
   [conf var & args]
-  (assert (instance? Var var))
   (cser/assoc! conf
     "parkour.partitioner.var" var
     "parkour.partitioner.args" args)
